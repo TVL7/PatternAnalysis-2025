@@ -33,10 +33,22 @@ Input MR images are resized/normalized to match the ImageNet pretraining statist
 
 ## Pre-Processing & Augmentations
 - **Input size / Resize:** `RandomResizeCrop(224, scale=(0.9, 1.0))` keeps most anatomy while adding slight scale variation for robustness
-- **Light Geometric Augments** `RandomHorizontalFlip(p=0.5)` and `RandomRotation(±10°)` provide invariance to small pose differences without distorting anatomy
-- 
+- **Light Geometric Augments:** `RandomHorizontalFlip(p=0.5)` and `RandomRotation(±10°)` provide invariance to small pose differences without distorting anatomy
+- **Normalization (ImageNet stats):** `mean=[0.485, 0.456, 0.406]`, `std=[0.229, 0.224, 0.225]`. Matching ConvNeXt's pretraining distribution speeds convergence and stabilises fine-tuning
+- **Validation Set:** The `test/` set remains untouched for final reporting. A **15% validation split** is sampled from `train/` with a fixed seed to tune hyper-parameters and select the operating threshold while preserving most data for training
 
-
+## Dependencies
+```python
+Python: 3.12
+torch: 2.4.1
+torchvision: 0.19.1
+timm: 1.0.9
+torchmetrics: 1.4.2
+scikit-learn: 1.5.1
+matplotlib: 3.9.2
+seaborn: 0.13.2
+numpy: 1.26.4
+```
 
 
 
