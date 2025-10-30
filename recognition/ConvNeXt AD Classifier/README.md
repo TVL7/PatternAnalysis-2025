@@ -15,9 +15,24 @@ ConvNeXt-Tiny is a modern convolutional neural network that “modernizes” a R
 ### How it works
 Input MR images are resized/normalized to match the ImageNet pretraining statistics, then passed through a patchify stem (4×4, stride 4) to create low-resolution feature maps. The network applies a sequence of ConvNeXt blocks—each block uses a depthwise 7×7 convolution, LayerNorm, a 1×1 expansion (GELU), and a 1×1 projection (with residual connection)—with stage transitions that downsample spatially while increasing channel width. Global average pooling aggregates features; a dropout-regularized linear layer outputs logits for the two classes. During training we optimize with AdamW and a cosine LR schedule; during evaluation we convert logits to probabilities, pick an operating threshold from validation (Youden or best-F1), and report accuracy/F1/AUROC on test.
 
-## 1. Problem & Approach (What it solves, how it works)
+## Problem & Approach (What it solves, how it works)
 **Problem:** Distinguishing AD from NC in MRI is challenging due to subtle anatomical changes and class imbalance.
 **Approach:** We replace ConvNeXt-Tiny's classifier with `Dropout(0.5) -> Linear(2)` and fine-tune using AdamW, Cosine LR, label smoothing, and class-weighted cross-entropy. During training we track AUROC, F1, and Accuracy, save the best checkpoint by validation AUROC, then choose a decision threshold on validation (Youden / best-F1) before reporting on test.
+
+## Project Structure
+```python
+├── dataset.py        # datasets, transforms, val split, dataloaders
+├── modules.py        # model/loss builders, train/eval, plotting, thresholds
+├── train.py          # training script → best.pt, history.json, figures
+├── predict.py        # evaluate a checkpoint on a folder
+├── requirements.txt  # pinned versions
+└── AD_NC/
+    ├── train/AD/   train/NC/
+    └── test/AD/    test/NC/
+```
+
+
+
 
 
 
