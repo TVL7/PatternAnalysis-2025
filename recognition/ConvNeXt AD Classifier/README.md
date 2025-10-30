@@ -12,6 +12,8 @@ This project fine-tunes ConvNeXt-Tiny (ImageNet-1K pretrained) to classify MRI s
 ### The Algorithm
 ConvNeXt-Tiny is a modern convolutional neural network that “modernizes” a ResNet-style backbone with design cues from Vision Transformers (e.g., larger depthwise kernels, inverted bottlenecks, LayerNorm, and stochastic depth). ConvNeXt keeps a pure-ConvNet hierarchy (patchifying stem → four stages of blocks → global pooling → linear head) and has shown ImageNet-level performance competitive with transformer backbones while remaining efficient and scalable. In this project the model is adapted for binary classification of ADNI MRI slices (Alzheimer’s Disease vs Normal Control) using a class-weighted cross-entropy objective and validation-tuned decision thresholds.
 
+![ConvNeXt Architecture](./images/convnext_architecture_diagram.png)
+
 ### How it works
 Input MR images are resized/normalized to match the ImageNet pretraining statistics, then passed through a patchify stem (4×4, stride 4) to create low-resolution feature maps. The network applies a sequence of ConvNeXt blocks—each block uses a depthwise 7×7 convolution, LayerNorm, a 1×1 expansion (GELU), and a 1×1 projection (with residual connection)—with stage transitions that downsample spatially while increasing channel width. Global average pooling aggregates features; a dropout-regularized linear layer outputs logits for the two classes. During training we optimize with AdamW and a cosine LR schedule; during evaluation we convert logits to probabilities, pick an operating threshold from validation (Youden or best-F1), and report accuracy/F1/AUROC on test.
 
@@ -68,7 +70,7 @@ Seeding is used to ensure that the same sequence of pseudorandomly generated num
 ![Example of Patient without Alzheimer's Disease](./images/808819_88.jpeg)
 
 
-## Results and Evaluation
+## Results
 
 ![Training Loss and Validation Loss](./images/training_loss_validation_loss.png)
 
@@ -77,4 +79,11 @@ Seeding is used to ensure that the same sequence of pseudorandomly generated num
 ![Validation Accuracy](./images/validation_accuracy.png)
 
 
+## Evaluation
+
+- **The training and validation fall together and remain close**, from early epochs, as seen in the Training Loss and Validation Loss graph. This indicates that the optimiser is stable, and that after 15-20 epochs, there are diminishing returns.
+  
+- **Unusually high validation accuracy** suggests that either the validation set is very easy and unrepresentative, or, the split leaks information.
+  
+- **Test score was 75.0%** which, in corroboration with the unusually hgih validation accuracy, suggests that some information from the training set may have leaked into the validation set, through near-duplicate images from the same subject.
 
