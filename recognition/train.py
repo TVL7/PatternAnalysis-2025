@@ -86,3 +86,12 @@ def main():
     plot_val_scores(hist, args.out)
     va_png, lv_png = plot_extras(hist, args.out)
     print(f"Saved:\n  {va_png}\n  {lv_png}")
+
+    # Load best & threshold selection on VAL
+    model.load_state_dict(torch.load(best_path, map_location=device))
+    val_out = evaluate(model, val_loader, criterion, str(device))
+    probs_v, ys_v = val_out["probs"], val_out["ys"]
+
+    thr_f1 = best_f1_threshold(ys_v, probs_v)
+    thr_y  = youden_threshold(ys_v, probs_v)
+    print(f"\n[VAL thresholds] best_F1_thr={thr_f1:.3f}  youden_thr={thr_y:.3f}")
