@@ -35,7 +35,11 @@ Input MR images are resized/normalized to match the ImageNet pretraining statist
 - **Input size / Resize:** `RandomResizeCrop(224, scale=(0.9, 1.0))` keeps most anatomy while adding slight scale variation for robustness
 - **Light Geometric Augments:** `RandomHorizontalFlip(p=0.5)` and `RandomRotation(±10°)` provide invariance to small pose differences without distorting anatomy
 - **Normalization (ImageNet stats):** `mean=[0.485, 0.456, 0.406]`, `std=[0.229, 0.224, 0.225]`. Matching ConvNeXt's pretraining distribution speeds convergence and stabilises fine-tuning
-- **Validation Set:** The `test/` set remains untouched for final reporting. A **15% validation split** is sampled from `train/` with a fixed seed to tune hyper-parameters and select the operating threshold while preserving most data for training
+
+## Split Justification
+- **Test Set:** remains untouched and is used only once, at the end, to estimate the trained model's performance against unseen data. The model never witnesses test images during development, so the reported test metric are not inflated.
+- **Validation Set:** is 15% of the total files within the train set. Validation sets below 10% can be too noisy for reliable model selection, but above 20%, there may be too great a sacrifice of training data, hence 15% is an appropriate middle ground.
+- **Training Set:** is the large majority of samples used for learning, which helps reduce the variance in fitted weights.
 
 ## Dependencies
 ```python
@@ -49,6 +53,9 @@ matplotlib: 3.9.2
 seaborn: 0.13.2
 numpy: 1.26.4
 ```
+
+## Reproducibility
+Seeding is used to ensure that the same sequence of pseudorandomly generated numbers are used in training, within Python, NumPy and Torch.
 
 
 
