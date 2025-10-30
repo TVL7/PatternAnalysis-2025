@@ -138,3 +138,27 @@ def plot_extras(hist: Dict[str, Any], out_dir: str):
     lv_path = os.path.join(out_dir, "loss_curves_alt.png")
     plt.savefig(lv_path, dpi=150); plt.close()
     return va_path, lv_path
+
+def plot_roc_cm(y_true: np.ndarray, y_prob: np.ndarray, thr_list, out_dir: str):
+    os.makedirs(out_dir, exist_ok=True)
+    # ROC
+    fpr, tpr, _ = roc_curve(y_true, y_prob)
+    AUC = auc(fpr, tpr)
+    plt.figure(); plt.plot(fpr, tpr); plt.plot([0,1],[0,1],'--')
+    plt.xlabel("FPR"); plt.ylabel("TPR"); plt.title(f"ROC AUC={AUC:.3f}")
+    plt.tight_layout()
+    roc_path = os.path.join(out_dir, "roc.png")
+    plt.savefig(roc_path, dpi=150); plt.close()
+
+    # Confusion matrices
+    for name, thr in thr_list:
+        cm = confusion_matrix(y_true, (y_prob >= thr).astype(int))
+        plt.figure()
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+        plt.title(f"Confusion Matrix @ {name} thr={thr:.3f}")
+        plt.xlabel("Pred"); plt.ylabel("True")
+        plt.tight_layout()
+        cm_path = os.path.join(out_dir, f"cm_{name.replace(' ', '_')}.png")
+        plt.savefig(cm_path, dpi=150); plt.close()
+
+    return roc_path
