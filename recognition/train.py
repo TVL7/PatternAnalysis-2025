@@ -48,3 +48,11 @@ def main():
     opt   = AdamW(model.parameters(), lr=args.lr, weight_decay=args.wd)
     sched = CosineAnnealingLR(opt, T_max=args.epochs)
     scaler = GradScaler(enabled=torch.cuda.is_available())
+
+    # Warm-up
+    _ = next(iter(train_loader))
+    print("Warm-up batch OK. Starting training...")
+
+    # Train loop
+    hist = {"epoch":[], "train_loss":[], "val_loss":[], "val_acc":[], "val_auroc":[], "val_f1":[]}
+    best_auc, best_path = -1.0, os.path.join(args.out, "best.pt")
