@@ -58,7 +58,9 @@ numpy: 1.26.4
 Seeding is used to ensure that the same sequence of pseudorandomly generated numbers are used in training, within Python, NumPy and Torch.
 
 ## Example Dataset Input Images
-[![Example of Patient with Alzheimer's Disease](images/218391_78.jpeg)](images/218391_78.jpeg)
+![Example of Patient with Alzheimer's Disease](./images/218391_78.jpeg)
+
+
 
 
 
