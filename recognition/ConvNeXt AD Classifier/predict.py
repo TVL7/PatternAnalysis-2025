@@ -1,3 +1,8 @@
+"""
+Evaluation script used to run the trained model on a dataset and
+report metrics. Uses 0.5 threshold by default
+"""
+
 import os, argparse, torch
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader

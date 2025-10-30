@@ -10,6 +10,7 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix, accuracy_score, f1
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# --- Model/Loss ---
 def build_model(dropout: float = 0.5, num_classes: int = 2, device: str = "cpu"):
     weights = ConvNeXt_Tiny_Weights.IMAGENET1K_V1
     model = convnext_tiny(weights=weights).to(device)
@@ -30,6 +31,7 @@ def get_loss(class_weights: torch.Tensor, label_smoothing: float, device: str):
     class_weights = class_weights.to(device) if class_weights is not None else None
     return nn.CrossEntropyLoss(weight=class_weights, label_smoothing=label_smoothing)
 
+# --- Train/Evaluate ---
 def train_epoch(model, loader, criterion, opt, scaler: GradScaler, device: str) -> float:
     model.train()
     tot = n = 0
@@ -73,7 +75,7 @@ def evaluate(model, loader, criterion, device: str) -> Dict[str, Any]:
         "ys":    torch.cat(ys_all).numpy(),
     }
 
-
+# --- Thresholds ---
 def youden_threshold(y_true: np.ndarray, y_prob: np.ndarray) -> float:
     fpr, tpr, thr = roc_curve(y_true, y_prob)
     idx = np.argmax(tpr - fpr)
@@ -91,6 +93,7 @@ def eval_with_threshold(y_true: np.ndarray, y_prob: np.ndarray, thr: float) -> T
     cm  = confusion_matrix(y_true, y_pred)
     return acc, f1, cm
 
+#--- Plotting / Logging
 def save_history(hist: Dict[str, Any], out_dir: str):
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, "history.json"), "w") as f:
