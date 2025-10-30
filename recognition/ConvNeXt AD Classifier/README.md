@@ -31,6 +31,11 @@ Input MR images are resized/normalized to match the ImageNet pretraining statist
     └── test/AD/    test/NC/
 ```
 
+## Pre-Processing & Augmentations
+- **Input size / Resize:** `RandomResizeCrop(224, scale=(0.9, 1.0))` keeps most anatomy while adding slight scale variation for robustness
+- **Light Geometric Augments** `RandomHorizontalFlip(p=0.5)` and `RandomRotation(±10°)` provide invariance to small pose differences without distorting anatomy
+- 
+
 
 
 
