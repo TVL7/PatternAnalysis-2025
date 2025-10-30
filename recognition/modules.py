@@ -17,7 +17,8 @@ def build_model(dropout: float = 0.5, num_classes: int = 2, device: str = "cpu")
     return model
 
 def get_loss(class_weights: torch.Tensor, label_smoothing: float, device: str):
-    return None
+    class_weights = class_weights.to(device) if class_weights is not None else None
+    return nn.CrossEntropyLoss(weight=class_weights, label_smoothing=label_smoothing)
 
 def train_epoch(model, loader, criterion, opt, scaler: GradScaler, device: str) -> float:
     return None
