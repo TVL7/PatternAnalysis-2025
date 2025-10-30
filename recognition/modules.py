@@ -38,5 +38,28 @@ def train_epoch(model, loader, criterion, opt, scaler: GradScaler, device: str) 
     return tot / max(n, 1)
 
 def evaluate(model, loader, criterion, device: str) -> Dict[str, Any]:
-    return None
+    model.eval()
+    acc  = BinaryAccuracy().to(device)
+    auro = BinaryAUROC().to(device)
+    f1m  = BinaryF1Score().to(device)
+    tot = n = 0
+    probs_all, ys_all = [], []
+    for x, y in loader:
+        x, y = x.to(device), y.to(device)
+        with autocast(enabled=torch.cuda.is_available()):
+            logits = model(x)
+            loss = criterion(logits, y)
+        bs = x.size(0)
+        tot += loss.item() * bs; n += bs
+        p = torch.softmax(logits, dim=1)[:, 1]
+        acc.update(p, y.int()); auro.update(p, y.int()); f1m.update(p, y.int())
+        probs_all.append(p.detach().cpu()); ys_all.append(y.detach().cpu())
+    return {
+        "loss":  tot / max(n, 1),
+        "acc":   acc.compute().item(),
+        "auroc": auro.compute().item(),
+        "f1":    f1m.compute().item(),
+        "probs": torch.cat(probs_all).numpy(),
+        "ys":    torch.cat(ys_all).numpy(),
+    }
 
