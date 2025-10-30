@@ -81,3 +81,7 @@ def eval_with_threshold(y_true: np.ndarray, y_prob: np.ndarray, thr: float) -> T
     cm  = confusion_matrix(y_true, y_pred)
     return acc, f1, cm
 
+def save_history(hist: Dict[str, Any], out_dir: str):
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, "history.json"), "w") as f:
+        json.dump(hist, f)
