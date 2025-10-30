@@ -63,3 +63,21 @@ def evaluate(model, loader, criterion, device: str) -> Dict[str, Any]:
         "ys":    torch.cat(ys_all).numpy(),
     }
 
+
+def youden_threshold(y_true: np.ndarray, y_prob: np.ndarray) -> float:
+    fpr, tpr, thr = roc_curve(y_true, y_prob)
+    idx = np.argmax(tpr - fpr)
+    return float(thr[idx])
+
+def best_f1_threshold(y_true: np.ndarray, y_prob: np.ndarray) -> float:
+    ts = np.linspace(0.01, 0.99, 99)
+    scores = [f1_score(y_true, (y_prob >= t).astype(int)) for t in ts]
+    return float(ts[int(np.argmax(scores))])
+
+def eval_with_threshold(y_true: np.ndarray, y_prob: np.ndarray, thr: float) -> Tuple[float, float, np.ndarray]:
+    y_pred = (y_prob >= thr).astype(int)
+    acc = accuracy_score(y_true, y_pred)
+    f1  = f1_score(y_true, y_pred)
+    cm  = confusion_matrix(y_true, y_pred)
+    return acc, f1, cm
+
