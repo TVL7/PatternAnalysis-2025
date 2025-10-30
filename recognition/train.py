@@ -26,3 +26,25 @@ def parse_args():
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--num_workers", type=int, default=2)
     return p.parse_args()
+
+def main():
+    args = parse_args()
+    os.makedirs(args.out, exist_ok=True)
+
+    # Device & seed
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    set_seed(args.seed)
+    print("Device:", device)
+
+    # Data
+    train_ds, val_ds, test_ds, meta = build_datasets(args.root, args.im_size, args.val_split, args.seed)
+    train_loader, val_loader, test_loader = build_loaders(train_ds, val_ds, test_ds, args.batch, args.num_workers)
+    print("Classes:", meta["classes"])
+    print("Train/Val/Test:", meta["train_len"], meta["val_len"], meta["test_len"])
+
+    # Model, loss, optim, sched
+    model = build_model(dropout=0.5, num_classes=2, device=device)
+    criterion = get_loss(torch.tensor(args.class_weights), args.label_smoothing, device=str(device))
+    opt   = AdamW(model.parameters(), lr=args.lr, weight_decay=args.wd)
+    sched = CosineAnnealingLR(opt, T_max=args.epochs)
+    scaler = GradScaler(enabled=torch.cuda.is_available())
