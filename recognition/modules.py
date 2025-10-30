@@ -21,7 +21,21 @@ def get_loss(class_weights: torch.Tensor, label_smoothing: float, device: str):
     return nn.CrossEntropyLoss(weight=class_weights, label_smoothing=label_smoothing)
 
 def train_epoch(model, loader, criterion, opt, scaler: GradScaler, device: str) -> float:
-    return None
+    model.train()
+    tot = n = 0
+    for x, y in loader:
+        x, y = x.to(device), y.to(device)
+        opt.zero_grad(set_to_none=True)
+        with autocast(enabled=torch.cuda.is_available()):
+            logits = model(x)
+            loss = criterion(logits, y)
+        scaler.scale(loss).backward()
+        scaler.step(opt)
+        scaler.update()
+        bs = x.size(0)
+        tot += loss.item() * bs
+        n += bs
+    return tot / max(n, 1)
 
 def evaluate(model, loader, criterion, device: str) -> Dict[str, Any]:
     return None
