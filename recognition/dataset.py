@@ -22,7 +22,35 @@ def get_transforms(im_size: int):
     return train_tf, eval_tf
 
 def build_datasets(root: str, im_size: int, val_split: float, seed: int) -> Tuple[Subset, Subset, datasets.ImageFolder, Dict[str, Any]]:   
+    """
+    Expects directory structure:
+      root/
+        train/AD, train/NC
+        test/AD,  test/NC
+    """
+    set_seed(seed)
+    train_dir = os.path.join(root, "train")
+    test_dir  = os.path.join(root, "test")
 
+    train_tf, eval_tf = get_transforms(im_size)
+    full_train_aug = datasets.ImageFolder(train_dir, transform=train_tf)   # for actual training
+    full_train_lbl = datasets.ImageFolder(train_dir, transform=eval_tf)    # for eval/val transform
+    test_ds        = datasets.ImageFolder(test_dir,  transform=eval_tf)
+
+    idxs = list(range(len(full_train_aug)))
+    random.shuffle(idxs)
+    n_val = max(1, int(val_split * len(idxs)))
+    val_idxs, train_idxs = idxs[:n_val], idxs[n_val:]
+    train_ds = Subset(full_train_aug, train_idxs)
+    val_ds   = Subset(full_train_lbl, val_idxs)
+
+    meta = {
+        "classes": full_train_lbl.classes,
+        "train_len": len(train_ds),
+        "val_len": len(val_ds),
+        "test_len": len(test_ds),
+    }
+    return train_ds, val_ds, test_ds, meta
 
 def build_loaders(
     train_ds, val_ds, test_ds,
