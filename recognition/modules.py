@@ -114,3 +114,27 @@ def plot_val_scores(hist: Dict[str, Any], out_dir: str):
     plt.savefig(path, dpi=150)
     plt.close()
     return path
+
+def plot_extras(hist: Dict[str, Any], out_dir: str):
+    os.makedirs(out_dir, exist_ok=True)
+    epochs = hist["epoch"]
+
+    # Validation Accuracy (%)
+    plt.figure(figsize=(7,4.5))
+    plt.plot(epochs, [100.0*a for a in hist["val_acc"]])
+    plt.title("Validation Accuracy")
+    plt.xlabel("Epoch"); plt.ylabel("Accuracy (%)")
+    plt.ylim(0, 100); plt.grid(alpha=0.25); plt.tight_layout()
+    va_path = os.path.join(out_dir, "val_accuracy.png")
+    plt.savefig(va_path, dpi=150); plt.close()
+
+    # Loss Curves (Validation then Training as per your example)
+    plt.figure(figsize=(7,4.5))
+    plt.plot(epochs, hist["val_loss"],   label="Validation Loss")
+    plt.plot(epochs, hist["train_loss"], label="Training Loss")
+    plt.title("Training Loss and Validation Loss")
+    plt.xlabel("Epoch"); plt.ylabel("Loss"); plt.legend()
+    plt.grid(alpha=0.25); plt.tight_layout()
+    lv_path = os.path.join(out_dir, "loss_curves_alt.png")
+    plt.savefig(lv_path, dpi=150); plt.close()
+    return va_path, lv_path
