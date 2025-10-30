@@ -1,4 +1,8 @@
-
+import os, random
+from typing import Tuple, Dict, Any
+import torch
+from torch.utils.data import DataLoader, Subset
+from torchvision import datasets, transforms
 
 def set_seed(seed: int):
     import numpy as np
@@ -56,3 +60,18 @@ def build_loaders(
     train_ds, val_ds, test_ds,
     batch_size: int, num_workers: int = 2
 ) -> Tuple[DataLoader, DataLoader, DataLoader]:
+    train_loader = DataLoader(
+        train_ds, batch_size=batch_size, shuffle=True,
+        num_workers=num_workers, pin_memory=True,
+        persistent_workers=True, prefetch_factor=4
+    )
+    val_loader = DataLoader(
+        val_ds, batch_size=batch_size, shuffle=False,
+        num_workers=num_workers, pin_memory=True,
+        persistent_workers=True, prefetch_factor=4
+    )
+    test_loader = DataLoader(
+        test_ds, batch_size=batch_size, shuffle=False,
+        num_workers=num_workers, pin_memory=True
+    )
+    return train_loader, val_loader, test_loader
