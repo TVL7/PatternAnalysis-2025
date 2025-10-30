@@ -79,3 +79,10 @@ def main():
             best_auc = va["auroc"]
             torch.save(model.state_dict(), best_path)
             print(f"  ↳ saved best (val_auroc={best_auc:.3f})")
+    
+    # Save curves & history
+    save_history(hist, args.out)
+    plot_loss_curves(hist, args.out)
+    plot_val_scores(hist, args.out)
+    va_png, lv_png = plot_extras(hist, args.out)
+    print(f"Saved:\n  {va_png}\n  {lv_png}")
