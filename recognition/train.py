@@ -56,3 +56,26 @@ def main():
     # Train loop
     hist = {"epoch":[], "train_loss":[], "val_loss":[], "val_acc":[], "val_auroc":[], "val_f1":[]}
     best_auc, best_path = -1.0, os.path.join(args.out, "best.pt")
+
+    for ep in range(1, args.epochs + 1):
+        t0 = time.time()
+        tr = train_epoch(model, train_loader, criterion, opt, scaler, str(device))
+        va = evaluate(model, val_loader, criterion, str(device))
+        sched.step()
+        dt = time.time() - t0
+
+        hist["epoch"].append(ep)
+        hist["train_loss"].append(tr)
+        hist["val_loss"].append(va["loss"])
+        hist["val_acc"].append(va["acc"])
+        hist["val_auroc"].append(va["auroc"])
+        hist["val_f1"].append(va["f1"])
+
+        print(f"[epoch {ep:02d} | {dt/60:.1f} min] "
+              f"train_loss={tr:.4f}  val_loss={va['loss']:.4f}  "
+              f"val_acc={va['acc']:.3f}  val_auroc={va['auroc']:.3f}  val_f1={va['f1']:.3f}")
+
+        if va["auroc"] > best_auc:
+            best_auc = va["auroc"]
+            torch.save(model.state_dict(), best_path)
+            print(f"  ↳ saved best (val_auroc={best_auc:.3f})")
