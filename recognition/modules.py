@@ -85,3 +85,32 @@ def save_history(hist: Dict[str, Any], out_dir: str):
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, "history.json"), "w") as f:
         json.dump(hist, f)
+
+
+def plot_loss_curves(hist: Dict[str, Any], out_dir: str):
+    os.makedirs(out_dir, exist_ok=True)
+    epochs = hist["epoch"]
+    # Loss
+    plt.figure()
+    plt.plot(epochs, hist["train_loss"], label="train")
+    plt.plot(epochs, hist["val_loss"], label="val")
+    plt.xlabel("epoch"); plt.ylabel("loss"); plt.legend(); plt.title("Loss")
+    plt.tight_layout()
+    path = os.path.join(out_dir, "loss_curves.png")
+    plt.savefig(path, dpi=150)
+    plt.close()
+    return path
+
+def plot_val_scores(hist: Dict[str, Any], out_dir: str):
+    os.makedirs(out_dir, exist_ok=True)
+    epochs = hist["epoch"]
+    plt.figure()
+    plt.plot(epochs, hist["val_acc"], label="acc")
+    plt.plot(epochs, hist["val_f1"], label="f1")
+    plt.plot(epochs, hist["val_auroc"], label="auroc")
+    plt.xlabel("epoch"); plt.ylabel("score"); plt.legend(); plt.title("Validation Metrics")
+    plt.tight_layout()
+    path = os.path.join(out_dir, "val_scores.png")
+    plt.savefig(path, dpi=150)
+    plt.close()
+    return path
