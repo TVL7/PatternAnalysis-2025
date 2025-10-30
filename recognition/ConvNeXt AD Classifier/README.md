@@ -68,7 +68,13 @@ Seeding is used to ensure that the same sequence of pseudorandomly generated num
 ![Example of Patient without Alzheimer's Disease](./images/808819_88.jpeg)
 
 
+## Results and Evaluation
 
+![Training Loss and Validation Loss](./images/training_loss_validation_loss.png)
+
+![Validation Metrics](./images/validation_metrics.png)
+
+![Validation Accuracy](./images/validation_accuracy.png)
 
 
 
