@@ -89,7 +89,7 @@ Seeding is used to ensure that the same sequence of pseudorandomly generated num
   
 - **Unusually high validation accuracy** suggests that either the validation set is very easy and unrepresentative, or, the split leaks information.
   
-- **Test score was 75.0%** which, in corroboration with the unusually hgih validation accuracy, suggests that some information from the training set may have leaked into the validation set, through near-duplicate images from the same subject.
+- **Test score was 76.1%** which, in corroboration with the unusually hgih validation accuracy, suggests that some information from the training set may have leaked into the validation set, through near-duplicate images from the same subject.
 
 
 ## Future Improvements
@@ -101,5 +101,6 @@ The brief for this task required at least 80% test accuracy. However the model o
 ## References
 
 Yu, Di & Fu, Haiyue & Song, Yanchen & Xie, Wenjian & Zhijie, Xie. (2023). Deep transfer learning rolling bearing fault diagnosis method based on convolutional neural network feature fusion. Measurement Science and Technology. 35. 10.1088/1361-6501/acfe31. 
+
 
 
