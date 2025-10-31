@@ -19,7 +19,7 @@ ConvNeXt-Tiny is a modern convolutional neural network that “modernizes” a R
 (Yu, 2023)
 
 ### How it works
-Input MR images are resized/normalized to match the ImageNet pretraining statistics, then passed through a patchify stem (4×4, stride 4) to create low-resolution feature maps. The network applies a sequence of ConvNeXt blocks—each block uses a depthwise 7×7 convolution, LayerNorm, a 1×1 expansion (GELU), and a 1×1 projection (with residual connection)—with stage transitions that downsample spatially while increasing channel width. Global average pooling aggregates features; a dropout-regularized linear layer outputs logits for the two classes. During training we optimize with AdamW and a cosine LR schedule; during evaluation we convert logits to probabilities, pick an operating threshold from validation (Youden or best-F1), and report accuracy/F1/AUROC on test.
+The MRI slices are first resized and normalized to match the ImageNet statistics used for ConvNeXt pretraining. They then pass through an initial 4×4 convolution with stride 4, which compresses the image into a coarser feature map. The network follows with stacked ConvNeXt blocks: each block performs a 7×7 depthwise convolution, applies LayerNorm, expands channels with a 1×1 layer + GELU, and then projects back with another 1×1, all inside a residual skip. Across stages, the feature maps become progressively coarser while the channel capacity grows, letting the model capture broader context and richer semantics. A global average pool turns the final features into a single vector, and a dropout-regularised linear layer produces two logits (AD vs NC). Training uses AdamW with a cosine learning-rate schedule; at evaluation we convert logits to probabilities, choose an operating threshold from validation (Youden or best-F1), and report Accuracy, F1, and AUROC on the test set.
 
 ## Problem & Approach (What it solves, how it works)
 **Problem:** Distinguishing AD from NC in MRI is challenging due to subtle anatomical changes and class imbalance.
@@ -101,6 +101,7 @@ The brief for this task required at least 80% test accuracy. However the model o
 ## References
 
 Yu, Di & Fu, Haiyue & Song, Yanchen & Xie, Wenjian & Zhijie, Xie. (2023). Deep transfer learning rolling bearing fault diagnosis method based on convolutional neural network feature fusion. Measurement Science and Technology. 35. 10.1088/1361-6501/acfe31. 
+
 
 
 
